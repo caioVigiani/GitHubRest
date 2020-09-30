@@ -1,0 +1,28 @@
+﻿
+@{
+    ViewBag.Title = "Repositório";
+}
+
+@if (ViewBag.error != null)
+{
+    <h2>@ViewBag.error</h2>
+}
+else
+{
+    <div class="container">
+        <h1><a href="@ViewBag.repositorio.html_url" target="_blank">@ViewBag.repositorio.name</a></h1>
+        <h3><a href="@ViewBag.repositorio.owner.html_url" target="_blank">@ViewBag.repositorio.owner.login</a></h3>
+        <p>Linguagem: @ViewBag.repositorio.language</p>
+        <p>Descrição: @ViewBag.repositorio.description</p>
+        <p>Ultima atualização: @ViewBag.repositorio.updated_at</p>
+
+        @if(ViewBag.repositorio.contribuidores != null)
+        {
+            <h2>Lista de Contribuidores</h2>
+            foreach(var contribuidor in ViewBag.repositorio.contribuidores)
+            {
+                <p>@contribuidor.login</p>
+            }
+        }
+    </div>
+}

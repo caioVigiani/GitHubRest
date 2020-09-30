@@ -1,0 +1,73 @@
+﻿@{
+    ViewBag.Title = "Repositórios Favoritados GitHub";
+}
+
+<div id="indexHeader" class="jumbotron text-center">
+    <h1>Meus Repositórios Favoritados</h1>
+</div>
+
+<div class="row">
+    <div class='col-md-offset-3 col-md-6 text-center div-table @(ViewBag.repositorios.Count == 0 ? "tabela-vazia" : "tabela-populada")'>
+        <div class="alert alert-warning">Nenhum repositório por aqui!</div>
+        <table class="table table-repositorios">
+            <thead>
+                <tr>
+                    <td>Usuário</td>
+                    <td>Nome</td>
+                    <td>Descrição</td>
+                    <td></td>
+                </tr>
+            </thead>
+            <tbody data-tipo="comum">
+                @foreach (var repositorio in ViewBag.repositorios)
+                {
+                    <tr data-nome-repositorio="@repositorio.name" data-nome-usuario="@repositorio.owner.login">
+                        <td><a href="@Url.Action("Usuario", "Home", new { loginUsuario = repositorio.owner.login })">@repositorio.owner.login</a></td>
+                        <td><a href="@Url.Action("Repositorio", "Home", new { loginUsuario = repositorio.owner.login, nomeRepositorio = repositorio.name })">@repositorio.name</a></td>
+                        <td>@repositorio.description</td>
+                        <td><i class="fa fa-star" aria-hidden="true" title="Desfavoritar"></i></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    $('.table-repositorios').click(event => {
+        if (event.target.tagName.toLowerCase() === 'i') {
+            event.preventDefault();
+
+            let linhaRepositorioClicada = $(event.target).parent().parent();
+
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("alterarHistoricoRepositorios", "Home")',
+                data: {
+                    usuario: $(linhaRepositorioClicada).data("nome-usuario"),
+                    repositorio: $(linhaRepositorioClicada).data("nome-repositorio"),
+                    incluir: false
+                },
+                success: function (data) {
+                    linhaRepositorioClicada.remove();
+                    atualizaClasseTabela();
+                },
+                error: function (ex) {
+                    alert('erro alterando historico');
+                }
+            });
+        }
+    });
+
+    function atualizaClasseTabela() {
+        $(".div-table").each((index, element) => {
+            if ($(element).find('tbody tr').length > 0) {
+                $(element).addClass('tabela-populada');
+                $(element).removeClass('tabela-vazia');
+            } else {
+                $(element).removeClass('tabela-populada');
+                $(element).addClass('tabela-vazia');
+            }
+        });
+    }
+</script>

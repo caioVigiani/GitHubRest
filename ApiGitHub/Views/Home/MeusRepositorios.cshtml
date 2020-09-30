@@ -1,0 +1,145 @@
+﻿@{
+    ViewBag.Title = "Repositórios GitHub";
+}
+
+<div id="indexHeader" class="jumbotron text-center">
+
+    @if (ViewBag.usuario.id == 0)
+    {
+        if (ViewBag.error != null)
+        {
+            <h1>@ViewBag.error</h1>
+        }
+        else
+        {
+            <h1>Procure por um usuário GitHub!</h1>
+        }
+    }
+    else
+    {
+        <h1>Repositórios de <a href="@Url.Action("Usuario", "Home", new { loginUsuario = ViewBag.usuario.login })"><b>@ViewBag.usuario.login</b></a></h1>
+    }
+
+    <div class="row">
+        <input class="form-control" type="text" id="gitHubSearch" placeholder="Buscar usuário do GitHub" value="@ViewBag.usuarioBuscado" />
+        <input class="form-control" type="text" id="filtroRepositorio" placeholder="Filtrar repositórios" value="@ViewBag.filtro" />
+    </div>
+    <button class="btn btn-info" id="btnSearch"><i class="fa fa-search" aria-hidden="true"></i></button>
+
+</div>
+
+@if (ViewBag.usuario.id > 0)
+{
+    <div class="row">
+        <input type="hidden" id="idUsuarioGitHub" value="@ViewBag.usuario.login" />
+        <div class='col-md-6 text-center div-table @(ViewBag.repositorios["comuns"].Count == 0 ? "tabela-vazia" : "tabela-populada")'>
+            <h2>Repositórios Comuns</h2>
+            <div class="alert alert-warning">Nenhum repositório por aqui!</div>
+            <table class="table table-repositorios">
+                <thead>
+                    <tr>
+                        <td>Nome</td>
+                        <td>Descrição</td>
+                        <td></td>
+                    </tr>
+                </thead>
+                <tbody data-tipo="comum">
+                    @foreach (var repositorio in ViewBag.repositorios["comuns"])
+                    {
+                        <tr data-nome-repositorio="@repositorio.name">
+                            <td><a href="@Url.Action("Repositorio", "Home", new { loginUsuario = ViewBag.usuario.login, nomeRepositorio = repositorio.name })">@repositorio.name</a></td>
+                            <td>@repositorio.description</td>
+                            <td><i class="fa fa-star-o" aria-hidden="true" title="Favoritar"></i></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class='col-md-6 text-center div-table @(ViewBag.repositorios["favoritos"].Count == 0 ? "tabela-vazia" : "tabela-populada")'>
+            <h2>Repositórios Favoritos</h2>
+            <div class="alert alert-warning">Nenhum repositório por aqui!</div>
+            <table class="table table-repositorios">
+                <thead>
+                    <tr>
+                        <td>Nome</td>
+                        <td>Descrição</td>
+                        <td></td>
+                    </tr>
+                </thead>
+                <tbody data-tipo="favorito">
+                    @foreach (var repositorio in ViewBag.repositorios["favoritos"])
+                    {
+                        <tr data-nome-repositorio="@repositorio.name">
+                            <td><a href="@Url.Action("Repositorio", "Home", new { loginUsuario = ViewBag.usuario.login, nomeRepositorio = repositorio.name })">@repositorio.name</a></td>
+                            <td>@repositorio.description</td>
+                            <td><i class="fa fa-star" aria-hidden="true" title="Desfavoritar"></i></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+<script>
+    $(document).ready(function () {
+        $("#btnSearch").click(event => {
+            event.preventDefault();
+            window.location.href = "@Url.Action("MeusRepositorios", "Home")" + "?usuarioDaBusca=" + $("#gitHubSearch").val() + "&filtroRepositorio=" + $("#filtroRepositorio").val();
+        });
+
+        $(document).keypress(function (e) {
+            if (e.which == 13)
+                $("#btnSearch").click();
+        });
+    });
+
+    $('.table-repositorios').click(event => {
+        if (event.target.tagName.toLowerCase() === 'i') {
+            event.preventDefault();
+
+            let linhaRepositorioClicada = $(event.target).parent().parent();
+
+            let tabelaAtual = linhaRepositorioClicada.parent().data("tipo");
+            let tabelaNova = (tabelaAtual == "comum" ? "favorito" : "comum");
+
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("alterarHistoricoRepositorios", "Home")',
+                data: {
+                    usuario: $("#idUsuarioGitHub").val(),
+                    repositorio: $(linhaRepositorioClicada).data("nome-repositorio"),
+                    incluir: (tabelaNova == "favorito")
+                },
+                success: function (data) {
+                    let cloneLinhaRepositorioClicada = linhaRepositorioClicada.clone(true);
+                    cloneLinhaRepositorioClicada.find("i")
+                        .attr("title", (tabelaNova == "comum" ? "Favoritar" : "Desfavoritar"))
+                        .attr("class", (tabelaNova == "comum" ? "fa fa-star-o" : "fa fa-star"));
+
+                    $(`tbody[data-tipo='${tabelaNova}']`).append(
+                        $("<tr>").append(cloneLinhaRepositorioClicada.html()).data("nome-repositorio", linhaRepositorioClicada.data("nome-repositorio"))
+                    );
+
+                    linhaRepositorioClicada.remove();
+                    atualizaClasseTabela();
+                },
+                error: function (ex) {
+                    alert('erro alterando historico');
+                }
+            });
+        }
+    });
+
+    function atualizaClasseTabela() {
+        $(".div-table").each((index, element) => {
+            if ($(element).find('tbody tr').length > 0) {
+                $(element).addClass('tabela-populada');
+                $(element).removeClass('tabela-vazia');
+            } else {
+                $(element).removeClass('tabela-populada');
+                $(element).addClass('tabela-vazia');
+            }
+        });
+    }
+</script>

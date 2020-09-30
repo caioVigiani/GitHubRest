@@ -1,0 +1,17 @@
+﻿@{
+    ViewBag.Title = "Usuario";
+}
+
+@if (ViewBag.error != null)
+{
+    <h2>@ViewBag.error</h2>
+}
+else
+{
+    <div class="container">
+        <h1><a href="@ViewBag.usuario.html_url" target="_blank">@ViewBag.usuario.login</a></h1>
+        <img class="img-thumbnail" src="@ViewBag.usuario.avatar_url" />
+        <p>Ultima atualização: @ViewBag.usuario.updated_at</p>
+        <p>Número de repositórios públicos: @ViewBag.usuario.public_repos</p>
+    </div>
+}

@@ -1,0 +1,54 @@
+﻿body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Override the default bootstrap behavior where horizontal description lists 
+   will truncate terms that are too long to fit in the left column 
+*/
+.dl-horizontal dt {
+    white-space: normal;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+.navbar-header a {
+    margin: auto !important;
+}
+
+#indexHeader {
+    padding: 4vh 3vw;
+}
+
+
+.div-table {
+    max-height: 38vh;
+    overflow: auto;
+}
+
+.tabela-vazia table.table-repositorios {
+    display: none;
+}
+
+.tabela-populada div.alert {
+    display: none;
+}
+
+.table-repositorios i {
+    cursor: pointer;
+}
+
+div .jumbotron input {
+    margin: 1.5rem auto 1rem;
+}

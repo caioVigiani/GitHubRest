@@ -1,0 +1,76 @@
+﻿@{
+    ViewBag.Title = "GitHub Repositories";
+}
+
+
+@if (ViewBag.usuario.id == 0)
+{
+    if (ViewBag.error != null)
+    {
+        <div class="jumbotron text-center">
+            <h1>@ViewBag.error</h1>
+        </div>
+    }
+    else
+    {
+        <div class="jumbotron text-center">
+            <h1>Procure por um usuário GitHub!</h1>
+        </div>
+    }
+}
+else
+{
+    <div class="jumbotron text-center">
+        <h1>Repositórios de <a href="@ViewBag.usuario.html_url" target="_blank"><b>@ViewBag.usuario.login</b></a></h1>
+    </div>
+
+    <div class="row">
+        <input type="hidden" id="idUsuarioGitHub" value="@ViewBag.usuario.id" />
+        <div class='col-md-6 text-center div-table @(ViewBag.repositorios["comuns"].Count == 0 ? "tabela-vazia" : "tabela-populada")'>
+            <h2>Repositórios Comuns</h2>
+            <div class="alert alert-warning">Nenhum repositório por aqui!</div>
+            <table class="table table-repositorios">
+                <thead>
+                    <tr>
+                        <td>Nome</td>
+                        <td>Descrição</td>
+                        <td></td>
+                    </tr>
+                </thead>
+                <tbody data-tipo="comum">
+                    @foreach (var repositorio in ViewBag.repositorios["comuns"])
+                    {
+                        <tr data-id-repositorio="@repositorio.id">
+                            <td><a href="@repositorio.html_url" target="_blank">@repositorio.name</a></td>
+                            <td>@repositorio.description</td>
+                            <td><i class="fa fa-star-o" aria-hidden="true" title="Favoritar"></i></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class='col-md-6 text-center div-table @(ViewBag.repositorios["favoritos"].Count == 0 ? "tabela-vazia" : "tabela-populada")'>
+            <h2>Repositórios Favoritos</h2>
+            <div class="alert alert-warning">Nenhum repositório por aqui!</div>
+            <table class="table table-repositorios">
+                <thead>
+                    <tr>
+                        <td>Nome</td>
+                        <td>Descrição</td>
+                        <td></td>
+                    </tr>
+                </thead>
+                <tbody data-tipo="favorito">
+                    @foreach (var repositorio in ViewBag.repositorios["favoritos"])
+                    {
+                        <tr data-id-repositorio="@repositorio.id">
+                            <td><a href="@repositorio.html_url" target="_blank">@repositorio.name</a></td>
+                            <td>@repositorio.description</td>
+                            <td><i class="fa fa-star" aria-hidden="true" title="Desfavoritar"></i></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
